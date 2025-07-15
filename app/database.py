@@ -15,7 +15,7 @@ def get_engine(database_url: str = settings.DATABASE_URL):
 def get_sessionmaker(engine):
     return sessionmaker(
         autocommit=False,
-        autoFlush=False,
+        autoflush=False,
         bind=engine
     )
 
