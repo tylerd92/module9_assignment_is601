@@ -9,6 +9,12 @@ pytest -s -v # for more verbose output
 pytest --preserve-db # to preserve the database between tests
 pytest --run-slow # to run slow tests
 ```
+GitHub Action Run
+![image](images/github_action_module_10.png)
+
+Updated Docker Repository
+![image](images/docker_module_10.png)
+
 
 Create Tables
 ![image](images/create_table.png)
