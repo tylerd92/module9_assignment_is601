@@ -1,6 +1,7 @@
 import pytest
 import logging
 import uuid
+import os
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
@@ -10,12 +11,13 @@ from datetime import datetime, timedelta
 from app.models.user import User
 from tests.conftest import create_fake_user, managed_db_session
 from tests.integration.test_fastapi_calculator import client
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 def test_database_connection(db_session):
     result = db_session.execute(text("SELECT 1"))

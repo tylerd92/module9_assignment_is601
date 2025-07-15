@@ -12,14 +12,15 @@ from pydantic import ValidationError
 
 from app.schemas.base import UserCreate
 from app.schemas.user import UserResponse, Token
+from dotenv import load_dotenv
+import os
+from app.config import settings
+
+load_dotenv()
 
 Base = declarative_base()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 class User(Base):
     __tablename__ = 'users'
@@ -49,14 +50,14 @@ class User(Base):
     @staticmethod
     def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
         to_encode = data.copy()
-        expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+        expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=float(settings.ACCESS_TOKEN_EXPIRE_MINUTES)))
         to_encode.update({"exp": expire})
-        return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    
+        return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
     @staticmethod
     def verify_token(token: str) -> Optional[UUID]:
         try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             user_id = payload.get("sub")
             return uuid.UUID(user_id) if user_id else None
         except (JWTError, ValueError):
