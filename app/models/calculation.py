@@ -79,6 +79,18 @@ class AbstractCalculation:
     
     def __repr__(self):
         return f"<Calculation(type={self.type}, inputs={self.inputs})>"
+    @classmethod
+    def create_calculation(cls, calculation_type: str, user_id: uuid.UUID, inputs: List[float]) -> "Calculation":
+        calculations = {
+            'addition': Addition,
+            'subtraction': Subtraction,
+            'multiplication': Multiplication,
+            'division': Division
+        }
+        calculation = calculations.get(calculation_type.lower())
+        if not calculation:
+            raise ValueError(f"Unsupported calculation type: {calculation_type}")
+        return calculation(user_id=user_id, inputs=inputs)
     
 class Calculation(Base, AbstractCalculation):
     __mapper_args__ = {

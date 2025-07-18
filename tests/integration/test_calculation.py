@@ -71,3 +71,52 @@ def test_invalid_list_for_multiplication():
     multiplication = Multiplication(user_id=dummy_user_id(), inputs="test")
     with pytest.raises(ValueError, match="Inputs must be a list of numbers."):
         multiplication.get_result()
+
+def test_calculcation_factory_addition():
+    inputs = [1, 2, 3]
+    calc = Calculation.create_calculation(
+        calculation_type='addition',
+        user_id=dummy_user_id(),
+        inputs=inputs,
+    )
+    assert isinstance(calc, Addition), "Factory did not return an Addition instance."
+    assert calc.get_result() == sum(inputs), "Incorrect addition result."
+
+def test_calculation_factory_subtraction():
+    inputs = [15, 7]
+    calc = Calculation.create_calculation(
+        calculation_type='subtraction',
+        user_id=dummy_user_id(),
+        inputs=inputs
+    )
+    assert isinstance(calc, Subtraction), "Factory did not return an Subtraction instance"
+    assert calc.get_result() == 8, "Incorrect subtraction result."
+
+def test_calculation_factory_multiplication():
+    inputs = [6, 5]
+    calc = Calculation.create_calculation(
+        calculation_type='multiplication',
+        user_id=dummy_user_id(),
+        inputs=inputs,
+    )
+
+    assert isinstance(calc, Multiplication), "Factory did not return a Multiplication instance."
+    assert calc.get_result() == 30, "Incorrect multiplication result."
+
+def test_calculation_factory_division():
+    inputs = [25, 5]
+    calc = Calculation.create_calculation(
+        calculation_type='division',
+        user_id=dummy_user_id(),
+        inputs=inputs
+    )
+    assert isinstance(calc, Division), "Factory did not return a Division instance."
+    assert calc.get_result() == 5, "Incorrect division result."
+
+def test_calculation_factory_invalid_type():
+    with pytest.raises(ValueError, match="Unsupported calculation type"):
+        Calculation.create_calculation(
+            calculation_type="power",
+            user_id=dummy_user_id(),
+            inputs=[2, 3]
+        )
