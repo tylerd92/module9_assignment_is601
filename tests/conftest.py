@@ -90,36 +90,22 @@ class ServerStartupError(Exception):
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_database(request):
-    """
-    Initialize the test database once per session:
-    - Drop all existing tables to ensure a clean state.
-    - Create all tables based on the current models.
-    - Optionally initialize the database with seed data.
-    After tests, drop all tables unless --preserve-db is set.
-    """
     logger.info("Setting up test database...")
 
-    # Drop all tables to ensure a clean slate
-    Base.metadata.drop_all(bind=test_engine)
-    logger.info("Dropped all existing tables.")
+    try:
+        Base.metadata.drop_all(bind=test_engine)
+        Base.metadata.create_all(bind=test_engine)
+        init_db()
+        logger.info("Test database initialized.")
+    except Exception as e:
+        logger.error(f"Error setting up test database: {str(e)}")
+        raise
 
-    # Create all tables
-    Base.metadata.create_all(bind=test_engine)
-    logger.info("Created all tables based on models.")
+    yield
 
-    # Initialize the database (e.g., run migrations or seed data)
-    init_db()
-    logger.info("Initialized the test database with initial data.")
-
-    yield  # All tests run here
-
-    preserve_db = request.config.getoption("--preserve-db")
-    if preserve_db:
-        logger.info("Skipping drop_db due to --preserve-db flag.")
-    else:
-        logger.info("Cleaning up test database...")
+    if not request.config.getoption("--preserve-db"):
+        logger.info("Dropping test database tables...")
         drop_db()
-        logger.info("Dropped test database tables.")
 
 @pytest.fixture
 def db_session(request) -> Generator[Session, None, None]:
